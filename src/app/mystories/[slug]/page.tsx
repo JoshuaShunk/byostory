@@ -12,6 +12,7 @@ interface Story {
   description: string;
   wordCount: number;
   slug: string;
+  story: string;
 }
 
 const StoryPage = ({ params }: { params: { slug: string } }) => {
