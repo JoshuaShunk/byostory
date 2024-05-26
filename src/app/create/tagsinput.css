@@ -1,0 +1,56 @@
+/* styles/tagsinput.css */
+.react-tagsinput {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  background-color: var(--input-bg);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.react-tagsinput-tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--tag-bg);
+  color: var(--tag-color);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.react-tagsinput-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  background-color: var(--remove-bg);
+  color: var(--remove-color);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+}
+
+.react-tagsinput-input {
+  flex: 1;
+  padding: 0.375rem 0.75rem;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  line-height: 1.5;
+  min-width: 150px; /* Ensure input is wide enough for placeholder */
+  background-color: var(--input-bg);
+  color: var(--input-text-color);
+}
+
+.react-tagsinput-input::placeholder {
+  color: var(--placeholder-color); /* Customize the placeholder color if needed */
+}
+
+/* Add dark mode variables in a :root selector in global.css or similar file */

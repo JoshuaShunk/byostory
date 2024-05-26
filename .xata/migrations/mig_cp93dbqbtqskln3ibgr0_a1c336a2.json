@@ -1,0 +1,17 @@
+{
+  "id": "mig_cp93dbqbtqskln3ibgr0",
+  "parentID": "mig_cp93d42btqskln3ibgq0",
+  "checksum": "1:a1c336a247a277827fc4b52597dea92ef8cb2a40973f432450622d88412b0300",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "name",
+          "type": "string",
+          "unique": true
+        },
+        "table": "stories"
+      }
+    }
+  ]
+}

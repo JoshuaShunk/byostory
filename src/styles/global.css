@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* styles/globals.css */
+
+:root {
+  --background-color: white;
+  --text-color: black;
+  --highlight-color-light: #f0f0f0; /* Slightly darker than white */
+  --highlight-color-dark: #333333; /* Slightly lighter than dark background */
+  --border-color-light: #e0e0e0; /* Light border color */
+  --border-color-dark: #444444; /* Dark border color */
+
+  --input-bg-light: #fff; /* Light input background color */
+  --input-bg-dark: #1a1a1a; /* Dark input background color */
+  --input-text-color-light: #000; /* Light input text color */
+  --input-text-color-dark: #e0e0e0; /* Dark input text color */
+  --placeholder-color-light: #a0a0a0; /* Light placeholder color */
+  --placeholder-color-dark: #707070; /* Dark placeholder color */
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border-color: var(--border-color-light);
+}
+
+.dark {
+  --background-color: #2b2b2b; /* Dark background color */
+  --text-color: #e0e0e0; /* Light text color */
+  --highlight-color: var(--highlight-color-dark);
+  --border-color: var(--border-color-dark);
+
+  --input-bg: var(--input-bg-dark);
+  --input-text-color: var(--input-text-color-dark);
+  --placeholder-color: var(--placeholder-color-dark);
+}
+
+.light {
+  --highlight-color: var(--highlight-color-light);
+  --border-color: var(--border-color-light);
+
+  --input-bg: var(--input-bg-light);
+  --input-text-color: var(--input-text-color-light);
+  --placeholder-color: var(--placeholder-color-light);
+}
+
+.highlighted {
+  background-color: var(--highlight-color);
+}
+
+.border-custom {
+  border-color: var(--border-color);
+}
+
+input, textarea, .react-tagsinput, .react-tagsinput-input {
+  background-color: var(--input-bg);
+  color: var(--input-text-color);
+  border-color: var(--border-color);
+}
+
+input::placeholder, textarea::placeholder, .react-tagsinput-input::placeholder {
+  color: var(--placeholder-color);
+}
+
+label {
+  color: var(--text-color);
+}
+
+/* styles/globals.css or a specific CSS/SCSS file */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.icon-transition {
+  transition: transform 0.5s ease-in-out;
+}
+
+.spin {
+  animation: spin 0.5s linear;
+}

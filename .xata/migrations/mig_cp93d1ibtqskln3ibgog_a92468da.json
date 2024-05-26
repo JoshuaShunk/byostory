@@ -1,0 +1,12 @@
+{
+  "id": "mig_cp93d1ibtqskln3ibgog",
+  "parentID": "mig_cp93cvqbtqskln3ibgng",
+  "checksum": "1:a92468dacb0a63769d788b963e38b7543f0fbbc745fd81910f0530424d2a7c8f",
+  "operations": [
+    {
+      "removeTable": {
+        "table": "essays"
+      }
+    }
+  ]
+}
