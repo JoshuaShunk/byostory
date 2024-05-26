@@ -13,6 +13,7 @@
     "@clerk/nextjs": "^5.1.2",
     "@iconify/react": "^4.1.1",
     "@mistralai/mistralai": "^0.3.0",
+    "@vercel/speed-insights": "^1.0.11",
     "@xata.io/cli": "^0.15.14",
     "@xata.io/client": "^0.29.4",
     "clsx": "^2.1.1",

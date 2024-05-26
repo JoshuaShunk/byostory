@@ -10,7 +10,7 @@ import ClientLayout from "@/components/clientLayout";
 import { Providers } from "./providers";
 import { ClerkProvider } from "@clerk/nextjs";
 
-const inter = Inter({ subsets: ["latin"] });
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Side Nav w/ submenus",
@@ -29,7 +29,10 @@ export default function RootLayout({
           <Providers>
             <ClientLayout>
               <MarginWidthWrapper>
-                <PageWrapper>{children}</PageWrapper>
+                <PageWrapper>
+                  {children}
+                  <SpeedInsights />
+                </PageWrapper>
               </MarginWidthWrapper>
             </ClientLayout>
           </Providers>
