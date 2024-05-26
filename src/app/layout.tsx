@@ -10,6 +10,8 @@ import { Providers } from "./providers";
 import { ClerkProvider } from "@clerk/nextjs";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
+
 
 export const metadata: Metadata = {
   title: "Build Your Own Story",
@@ -31,6 +33,7 @@ export default function RootLayout({
                 <PageWrapper>
                   {children}
                   <SpeedInsights />
+                  <Analytics />
                 </PageWrapper>
               </MarginWidthWrapper>
             </ClientLayout>
