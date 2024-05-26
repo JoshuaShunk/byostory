@@ -8,5 +8,4 @@ export const PREDEFINED_TAGS = [
   'thriller',
   'non-fiction',
   'historical',
-  'biography'
 ];
