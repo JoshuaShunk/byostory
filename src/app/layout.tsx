@@ -12,7 +12,6 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 
-
 export const metadata: Metadata = {
   title: "Build Your Own Story",
   description: "Use LLM to generate your own build your own story.",
