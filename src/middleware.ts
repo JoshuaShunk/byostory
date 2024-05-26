@@ -14,13 +14,11 @@ export default clerkMiddleware((auth, req) => {
   if (isProtectedRoute(req)) auth().protect();
 });
 
-// Update matcher to exclude /terms and /privacy
+// Update matcher to include only protected routes and exclude /terms and /privacy
 export const config = {
   matcher: [
-    '/((?!.*\\..*|_next).*)', 
+    '/((?!terms|privacy).*)',  // Exclude /terms and /privacy
     '/', 
-    '/(api|trpc)(.*)', 
-    '!/terms', // Exclude /terms
-    '!/privacy' // Exclude /privacy
+    '/(api|trpc)(.*)'
   ],
 };
