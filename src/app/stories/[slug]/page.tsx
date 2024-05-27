@@ -77,9 +77,9 @@ const StoryPage = async ({ params }: { params: { slug: string } }) => {
   };
 
   // Increment views if the story is loaded successfully and the viewer is not the author
-  if (story.userId !== userId) {
-    await incrementViews(story.id);
-  }
+  
+  await incrementViews(story.id);
+  
 
   return (
     <div className="container mx-auto p-4">
