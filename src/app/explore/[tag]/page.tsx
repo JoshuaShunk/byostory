@@ -3,7 +3,6 @@
 import { getXataClient } from "@/xata";
 import { clerkClient } from "@clerk/nextjs/server";
 import Link from "next/link";
-import { PREDEFINED_TAGS } from "@/tags";
 
 interface Story {
   id: string;
