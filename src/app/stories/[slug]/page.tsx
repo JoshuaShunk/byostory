@@ -1,17 +1,5 @@
 import Link from "next/link";
 
-interface Story {
-  id: string;
-  name: string;
-  tags: string;
-  description: string;
-  wordCount: number;
-  slug: string;
-  userId: string;
-  story: string;
-  accountName: string;
-}
-
 async function fetchStoryBySlug(slug: string) {
   const res = await fetch(
     `${
