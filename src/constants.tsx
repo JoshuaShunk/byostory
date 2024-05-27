@@ -46,7 +46,7 @@ export const BOTTOM_SIDENAV_ITEMS: SideNavItem[] = [
   },
   {
     title: "Settings",
-    path: "/settings/account",
+    path: "/settings",
     icon: <Icon icon="lucide:settings" width="24" height="24" />,
   },
 ];

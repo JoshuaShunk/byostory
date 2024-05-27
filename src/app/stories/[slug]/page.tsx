@@ -1,8 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 
 interface Story {
@@ -14,55 +9,30 @@ interface Story {
   slug: string;
   userId: string;
   story: string;
-  accountName: string; // Adding accountName to the Story interface
+  accountName: string;
 }
 
-const StoryPage = ({ params }: { params: { slug: string } }) => {
-  const { slug } = params;
-  const { isLoaded, userId } = useAuth();
-  const [story, setStory] = useState<Story | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchStoryBySlug = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(
-          `/api/public-stories?slug=${encodeURIComponent(slug)}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        if (!res.ok) throw new Error("Failed to fetch story");
-        const data = await res.json();
-        setStory(data.story);
-
-        // Increment views if the story is loaded successfully and the viewer is not the author
-        if (data.story && data.story.userId !== userId) {
-          await fetch(`/api/increment-views`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ storyId: data.story.id }),
-          });
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (isLoaded) {
-      fetchStoryBySlug();
+async function fetchStoryBySlug(slug: string) {
+  const res = await fetch(
+    `${
+      process.env.NEXT_PUBLIC_API_URL
+    }/api/public-stories?slug=${encodeURIComponent(slug)}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
     }
-  }, [isLoaded, userId, slug, router]);
+  );
 
-  if (loading) return <div>Loading...</div>;
+  if (!res.ok) throw new Error("Failed to fetch story");
+
+  const data = await res.json();
+  return data.story;
+}
+
+const StoryPage = async ({ params }: { params: { slug: string } }) => {
+  const { slug } = params;
+  const story = await fetchStoryBySlug(slug);
 
   if (!story) return <div>Story not found</div>;
 
