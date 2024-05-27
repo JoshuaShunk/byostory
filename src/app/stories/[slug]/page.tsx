@@ -1,4 +1,32 @@
+// app/stories/[slug]/page.tsx
+
+import { getXataClient } from "@/xata";
+import { auth } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+
+interface Story {
+  id: string;
+  name: string;
+  tags: string;
+  description: string;
+  wordCount: number;
+  slug: string;
+  story: string;
+  userId: string;
+  accountName?: string;
+}
+
+const fetchUserDetails = async (userId: string) => {
+  try {
+    const user = await clerkClient.users.getUser(userId);
+    return user;
+  } catch (error) {
+    console.error(`Error fetching user details for userId ${userId}:`, error);
+    return null;
+  }
+};
 
 async function fetchStoryBySlug(slug: string) {
   const res = await fetch(
@@ -18,11 +46,40 @@ async function fetchStoryBySlug(slug: string) {
   return data.story;
 }
 
-const StoryPage = async ({ params }: { params: { slug: string } }) => {
-  const { slug } = params;
-  const story = await fetchStoryBySlug(slug);
+async function incrementViews(storyId: string) {
+  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/increment-views`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ storyId }),
+  });
+}
 
-  if (!story) return <div>Story not found</div>;
+const StoryPage = async ({ params }: { params: { slug: string } }) => {
+  const { userId } = auth();
+  if (!userId) {
+    redirect("/sign-in"); // Redirect to sign-in if the user is not authenticated
+  }
+
+  const { slug } = params;
+  const storyData = await fetchStoryBySlug(slug);
+
+  if (!storyData) return <div>Story not found</div>;
+
+  // Fetch user details for the story's author
+  const account = await fetchUserDetails(storyData.userId);
+  const story: Story = {
+    ...storyData,
+    accountName: account
+      ? `${account.firstName} ${account.lastName}`
+      : "Unknown",
+  };
+
+  // Increment views if the story is loaded successfully and the viewer is not the author
+  if (story.userId !== userId) {
+    await incrementViews(story.id);
+  }
 
   return (
     <div className="container mx-auto p-4">
