@@ -46,14 +46,23 @@ async function fetchStoryBySlug(slug: string) {
   return data.story;
 }
 
-async function incrementViews(storyId: string) {
-  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/increment-views`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ storyId }),
-  });
+async function incrementViews(storyId: string, userId: string) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/increment-views`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`, // Pass userId as a bearer token
+      },
+      body: JSON.stringify({ storyId }),
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error("Error incrementing views:", errorData.message);
+  }
 }
 
 const StoryPage = async ({ params }: { params: { slug: string } }) => {
@@ -77,9 +86,9 @@ const StoryPage = async ({ params }: { params: { slug: string } }) => {
   };
 
   // Increment views if the story is loaded successfully and the viewer is not the author
-  
-  await incrementViews(story.id);
-  
+  if (story.userId !== userId) {
+    await incrementViews(story.id, userId);
+  }
 
   return (
     <div className="container mx-auto p-4">

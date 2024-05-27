@@ -24,8 +24,8 @@ const tables = [
   {
     name: "story_views",
     columns: [
-      { name: "storyId", type: "string", unique: true },
       { name: "userId", type: "string", notNull: true, defaultValue: "null" },
+      { name: "storyId", type: "string", notNull: true, defaultValue: "null" },
     ],
   },
 ] as const;

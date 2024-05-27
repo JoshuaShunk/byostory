@@ -1,3 +1,5 @@
+// api/increment-views.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getXataClient } from '@/xata';
 import { auth } from '@clerk/nextjs/server';
@@ -6,25 +8,30 @@ const xata = getXataClient();
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = auth();
+    const authorizationHeader = req.headers.get('authorization');
+    const userId = authorizationHeader ? authorizationHeader.replace('Bearer ', '') : null;
 
     if (!userId) {
+      console.log('Unauthorized access attempt');
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
     const { storyId } = await req.json();
 
     if (!storyId) {
+      console.log('Story ID is missing');
       return NextResponse.json({ message: 'Story ID is required' }, { status: 400 });
     }
 
     const story = await xata.db.stories.read(storyId);
 
     if (!story) {
+      console.log('Story not found');
       return NextResponse.json({ message: 'Story not found' }, { status: 404 });
     }
 
     if (story.userId === userId) {
+      console.log('Author attempting to increment views on their own story');
       return NextResponse.json({ message: 'Authors cannot increment views on their own stories' }, { status: 403 });
     }
 
@@ -37,6 +44,7 @@ export async function POST(req: NextRequest) {
       .getFirst();
 
     if (existingView) {
+      console.log('View already counted for this user');
       return NextResponse.json({ message: 'View already counted' }, { status: 200 });
     }
 
@@ -51,6 +59,7 @@ export async function POST(req: NextRequest) {
       views: (story.views || 0) + 1,
     });
 
+    console.log('View count incremented successfully');
     return NextResponse.json({ message: 'View count incremented' }, { status: 200 });
   } catch (error) {
     console.error('Error incrementing views:', error);
