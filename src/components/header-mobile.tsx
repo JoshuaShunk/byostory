@@ -7,9 +7,9 @@ import { TOP_SIDENAV_ITEMS, BOTTOM_SIDENAV_ITEMS } from "@/constants";
 import { SideNavItem } from "@/types";
 import { Icon } from "@iconify/react";
 import { motion, useCycle } from "framer-motion";
-import { useTheme } from "next-themes";
 import ThemeSwitch from "./ThemeSwitch";
 import useIsMobile from "@/hooks/use-is-mobile";
+import { useUser, UserButton } from "@clerk/nextjs";
 
 type MenuItemWithSubMenuProps = {
   item: SideNavItem;
@@ -41,6 +41,7 @@ const HeaderMobile = () => {
   const { height } = useDimensions(containerRef);
   const [isOpen, toggleOpen] = useCycle(false, true);
   const isMobile = useIsMobile();
+  const { isLoaded, user } = useUser();
 
   return (
     <motion.nav
@@ -58,9 +59,9 @@ const HeaderMobile = () => {
       />
       <motion.ul
         variants={variants}
-        className="absolute flex flex-col justify-between w-full gap-3 px-10 py-16 max-h-screen overflow-y-auto border-custom"
+        className="absolute flex flex-col justify-between w-full px-10 py-16 max-h-screen overflow-y-auto border-custom"
       >
-        <div className="flex-grow">
+        <div className="flex-grow space-y-3">
           {TOP_SIDENAV_ITEMS.map((item, idx) => (
             <div key={idx}>
               {item.submenu ? (
@@ -78,78 +79,112 @@ const HeaderMobile = () => {
                   </Link>
                 </MenuItem>
               )}
-              <MenuItem className="my-3 h-px w-full bg-gray-300 border-custom" />
             </div>
           ))}
         </div>
 
-        {isMobile && (
+        {isMobile && isOpen && (
           <div className="my-3">
             <ThemeSwitch />
           </div>
         )}
 
-        <div className="mt-4">
-          {BOTTOM_SIDENAV_ITEMS.map((item, idx) => (
-            <div key={idx}>
-              <MenuItem>
-                <Link
-                  href={item.path}
-                  onClick={() => toggleOpen()}
-                  className={`flex w-full text-2xl ${
-                    item.path === pathname ? "font-bold highlighted" : ""
-                  }`}
-                >
-                  {item.title}
-                </Link>
-              </MenuItem>
-              <MenuItem className="my-3 h-px w-full bg-gray-300 border-custom" />
-            </div>
-          ))}
+        <div className="fixed bottom-0 pb-8 w-full">
+          <div className="mt-auto flex flex-col space-y-3">
+            {BOTTOM_SIDENAV_ITEMS.map((item, idx) => (
+              <div key={idx}>
+                <MenuItem>
+                  <Link
+                    href={item.path}
+                    onClick={() => toggleOpen()}
+                    className={`flex w-full text-2xl ${
+                      item.path === pathname ? "font-bold highlighted" : ""
+                    }`}
+                  >
+                    {item.title}
+                  </Link>
+                </MenuItem>
+              </div>
+            ))}
+
+            {isLoaded && user && isOpen && (
+              <div className="mb-6 flex items-center space-x-3">
+                <UserButton afterSignOutUrl="/" />
+                <div>
+                  <p className="font-semibold">{user.fullName}</p>
+                  <p className="text-sm text-gray-600">
+                    {user.primaryEmailAddress?.emailAddress || "No email"}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </motion.ul>
-      <MenuToggle toggle={toggleOpen} />
+      <MenuToggle toggle={toggleOpen} isOpen={isOpen} />
     </motion.nav>
   );
 };
 
 export default HeaderMobile;
 
-const MenuToggle = ({ toggle }: { toggle: any }) => (
-  <button
-    onClick={toggle}
-    className="pointer-events-auto absolute right-4 top-[14px] z-30"
-  >
-    <svg width="23" height="23" viewBox="0 0 23 23">
-      <Path
-        variants={{
-          closed: { d: "M 2 2.5 L 20 2.5" },
-          open: { d: "M 3 16.5 L 17 2.5" },
-        }}
-      />
-      <Path
-        d="M 2 9.423 L 20 9.423"
-        variants={{
-          closed: { opacity: 1 },
-          open: { opacity: 0 },
-        }}
-        transition={{ duration: 0.1 }}
-      />
-      <Path
-        variants={{
-          closed: { d: "M 2 16.346 L 20 16.346" },
-          open: { d: "M 3 2.5 L 17 16.346" },
-        }}
-      />
-    </svg>
-  </button>
-);
+const MenuToggle = ({ toggle, isOpen }: { toggle: any; isOpen: boolean }) => {
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+
+  useEffect(() => {
+    const handleThemeChange = () => {
+      const theme = document.documentElement.classList.contains("dark");
+      setIsDarkTheme(theme);
+    };
+
+    handleThemeChange(); // Set initial theme
+
+    window.addEventListener("storage", handleThemeChange);
+    return () => {
+      window.removeEventListener("storage", handleThemeChange);
+    };
+  }, []);
+
+  return (
+    <button
+      onClick={toggle}
+      className="pointer-events-auto absolute right-4 top-[14px] z-30"
+    >
+      <svg
+        width="23"
+        height="23"
+        viewBox="0 0 23 23"
+        stroke="grey"
+      >
+        <Path
+          variants={{
+            closed: { d: "M 2 2.5 L 20 2.5" },
+            open: { d: "M 3 16.5 L 17 2.5" },
+          }}
+        />
+        <Path
+          d="M 2 9.423 L 20 9.423"
+          variants={{
+            closed: { opacity: 1 },
+            open: { opacity: 0 },
+          }}
+          transition={{ duration: 0.1 }}
+        />
+        <Path
+          variants={{
+            closed: { d: "M 2 16.346 L 20 16.346" },
+            open: { d: "M 3 2.5 L 17 16.346" },
+          }}
+        />
+      </svg>
+    </button>
+  );
+};
 
 const Path = (props: any) => (
   <motion.path
     fill="transparent"
     strokeWidth="2"
-    stroke="hsl(0, 0%, 18%)"
     strokeLinecap="round"
     {...props}
   />
