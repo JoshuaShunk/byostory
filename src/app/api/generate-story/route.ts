@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   const { description, part, totalParts, currentStory, path } = await request.json();
 
   const messages: Message[] = [
-    { role: 'system', content: `You are an AI that generates a story based on the user's description and previous parts.` },
+    { role: 'system', content: `You are an AI that generates a story based on the user's description and previous parts. Do not create a title just start the story.` },
     { role: 'user', content: `Description: ${description}` },
     { role: 'assistant', content: `Current story: ${currentStory}` },
     { 
@@ -27,23 +27,25 @@ export async function POST(request: Request) {
     },
   ];
 
-  const response = await client.chat({
+  const chatStreamResponse = await client.chatStream({
     model: 'mistral-small-latest',
     messages: messages,
   });
 
-  const { storyContent, options } = extractOptionsFromContent(response.choices[0].message.content);
-  const wordCount = storyContent.split(' ').length;
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      for await (const chunk of chatStreamResponse) {
+        if (chunk.choices[0].delta.content !== undefined) {
+          const streamText = chunk.choices[0].delta.content;
+          controller.enqueue(encoder.encode(streamText));
+        }
+      }
+      controller.close();
+    }
+  });
 
-  return NextResponse.json({ content: storyContent, options, wordCount });
-}
-
-function extractOptionsFromContent(content: string): { storyContent: string, options: string[] } {
-  const options: string[] = [];
-  const contentWithoutOptions = content.replace(/Option \d: .*\n?/g, (match) => {
-    options.push(match.replace(/Option \d: /, '').trim());
-    return '';
-  }).trim();
-
-  return { storyContent: contentWithoutOptions, options };
+  return new Response(stream, {
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
 }

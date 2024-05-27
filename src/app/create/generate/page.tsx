@@ -35,9 +35,25 @@ const GenerateStoryPage = ({ params }: { params: any }) => {
           }),
         });
 
-        const data = await response.json();
-        setStory(data.content);
-        setOptions(data.options || []);
+        if (!response.body) {
+          throw new Error("Readable stream not supported");
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let storyContent = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          storyContent += decoder.decode(value, { stream: true });
+          setStory(storyContent);
+        }
+
+        const { storyContent: finalContent, options } =
+          extractOptionsFromContent(storyContent);
+        setStory(finalContent);
+        setOptions(options || []);
         setCurrentPart(1); // Ensure we set the current part to 1 after the first generation
       } catch (error) {
         console.error("Error generating story:", error);
@@ -67,9 +83,25 @@ const GenerateStoryPage = ({ params }: { params: any }) => {
         }),
       });
 
-      const data = await response.json();
-      setStory((prevStory) => prevStory + "\n\n" + data.content);
-      setOptions(data.options || []);
+      if (!response.body) {
+        throw new Error("Readable stream not supported");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let storyContent = story;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        storyContent += decoder.decode(value, { stream: true });
+        setStory(storyContent);
+      }
+
+      const { storyContent: finalContent, options } =
+        extractOptionsFromContent(storyContent);
+      setStory(finalContent);
+      setOptions(options || []);
       setCurrentPart(nextPart);
     } catch (error) {
       console.error("Error generating story part:", error);
@@ -138,7 +170,7 @@ const GenerateStoryPage = ({ params }: { params: any }) => {
         {loading && currentPart === 1 && <Loader />}
       </div>
       {loading && currentPart > 1 && (
-        <div className="flex space-x-4 mt-6">
+        <div className="flex space-x-4 mt-20">
           <Loader />
         </div>
       )}
@@ -179,5 +211,20 @@ const GenerateStoryPage = ({ params }: { params: any }) => {
     </div>
   );
 };
+
+function extractOptionsFromContent(content: string): {
+  storyContent: string;
+  options: string[];
+} {
+  const options: string[] = [];
+  const contentWithoutOptions = content
+    .replace(/Option \d: .*\n?/g, (match) => {
+      options.push(match.replace(/Option \d: /, "").trim());
+      return "";
+    })
+    .trim();
+
+  return { storyContent: contentWithoutOptions, options };
+}
 
 export default GenerateStoryPage;
