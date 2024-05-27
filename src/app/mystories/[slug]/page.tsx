@@ -1,9 +1,10 @@
-"use client";
+// app/mystories/[slug]/page.tsx
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
+import { getXataClient } from "@/xata";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import Link from "next/link";
+import React from "react";
 
 interface Story {
   id: string;
@@ -15,48 +16,32 @@ interface Story {
   story: string;
 }
 
-const StoryPage = ({ params }: { params: { slug: string } }) => {
+const StoryPage = async ({ params }: { params: { slug: string } }) => {
   const { slug } = params;
-  const { isLoaded, userId } = useAuth();
-  const [story, setStory] = useState<Story | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const { userId } = auth();
 
-  useEffect(() => {
-    if (isLoaded && !userId) {
-      router.push("/sign-in");
-      return;
-    }
+  if (!userId) {
+    redirect("/sign-in"); // Redirect to sign-in if the user is not authenticated
+  }
 
-    if (userId) {
-      const fetchStoryBySlug = async () => {
-        setLoading(true);
-        try {
-          const res = await fetch(
-            `/api/user-stories?slug=${encodeURIComponent(slug)}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          if (!res.ok) throw new Error("Failed to fetch story");
-          const data = await res.json();
-          setStory(data.story);
-        } catch (error) {
-          console.error(error);
-        } finally {
-          setLoading(false);
-        }
-      };
+  const xataClient = getXataClient();
+  const storyData = await xataClient.db.stories
+    .filter({ slug, userId })
+    .getFirst();
 
-      fetchStoryBySlug();
-    }
-  }, [isLoaded, userId, slug, router]);
+  if (!storyData) {
+    return <div>Story not found</div>;
+  }
 
-  if (loading) return <div>Loading...</div>;
-
-  if (!story) return <div>Story not found</div>;
+  const story: Story = {
+    id: storyData.id ?? "",
+    name: storyData.name ?? "Untitled",
+    tags: storyData.tags ?? "",
+    description: storyData.description ?? "No description",
+    wordCount: storyData.wordCount ?? 0,
+    slug: storyData.slug ?? "",
+    story: storyData.story ?? "",
+  };
 
   return (
     <div className="container mx-auto p-4">

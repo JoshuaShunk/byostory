@@ -34,83 +34,85 @@ const Dashboard = async () => {
       <h1 className="font-bold text-4xl mb-6">
         Welcome {user.firstName || "User"}
       </h1>
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">
-          Recently Worked on Stories
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {userStories.length > 0 ? (
-            userStories.map((story: any) => (
-              <div
-                key={story.id}
-                className="relative flex flex-col bg-white dark:bg-zinc-800 p-4 shadow-md rounded-lg"
-              >
-                <h3 className="text-xl font-semibold mb-2">{story.name}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  {story.tags && JSON.parse(story.tags).join(", ")}
-                </p>
-                <p className="text-sm mb-4">{story.description}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {story.wordCount} words
-                </p>
-                <div className="mt-auto">
-                  <Link
-                    href={
-                      story.isPublic
-                        ? `/stories/${story.slug}`
-                        : `/mystories/${story.slug}`
-                    }
-                    className="text-blue-500 hover:underline"
-                  >
-                    Read more
-                  </Link>
+      <div className="container mx-auto">
+        <section className="mb-20">
+          <h2 className="text-2xl font-semibold mb-4">
+            Recently Worked on Stories
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {userStories.length > 0 ? (
+              userStories.map((story: any) => (
+                <div
+                  key={story.id}
+                  className="relative flex flex-col bg-white dark:bg-zinc-800 p-4 shadow-md rounded-lg"
+                >
+                  <h3 className="text-xl font-semibold mb-2">{story.name}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    {story.tags && JSON.parse(story.tags).join(", ")}
+                  </p>
+                  <p className="text-sm mb-4">{story.description}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {story.wordCount} words
+                  </p>
+                  <div className="mt-auto">
+                    <Link
+                      href={
+                        story.isPublic
+                          ? `/stories/${story.slug}`
+                          : `/mystories/${story.slug}`
+                      }
+                      className="text-blue-500 hover:underline"
+                    >
+                      Read more
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-600 dark:text-gray-400">
-              No stories found.
-            </p>
-          )}
-        </div>
-      </section>
-      <section>
-        <div className="flex items-center mb-4">
-          <h2 className="text-2xl font-semibold ">Trending</h2>
-          <Flame className="ml-3"/>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {trendingStories.length > 0 ? (
-            trendingStories.map((story: any) => (
-              <div
-                key={story.id}
-                className="relative flex flex-col bg-white dark:bg-zinc-800 p-4 shadow-md rounded-lg"
-              >
-                <h3 className="text-xl font-semibold mb-2">{story.name}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  {story.tags && JSON.parse(story.tags).join(", ")}
-                </p>
-                <p className="text-sm mb-4">{story.description}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {story.wordCount} words
-                </p>
-                <div className="mt-auto">
-                  <Link
-                    href={`/stories/${story.slug}`}
-                    className="text-blue-500 hover:underline"
-                  >
-                    Read more
-                  </Link>
+              ))
+            ) : (
+              <p className="text-gray-600 dark:text-gray-400">
+                No stories found.
+              </p>
+            )}
+          </div>
+        </section>
+        <section className="mt-20">
+          <div className="flex items-center mb-4">
+            <h2 className="text-2xl font-semibold ">Trending</h2>
+            <Flame className="ml-3" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {trendingStories.length > 0 ? (
+              trendingStories.map((story: any) => (
+                <div
+                  key={story.id}
+                  className="relative flex flex-col bg-white dark:bg-zinc-800 p-4 shadow-md rounded-lg"
+                >
+                  <h3 className="text-xl font-semibold mb-2">{story.name}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    {story.tags && JSON.parse(story.tags).join(", ")}
+                  </p>
+                  <p className="text-sm mb-4">{story.description}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {story.wordCount} words
+                  </p>
+                  <div className="mt-auto">
+                    <Link
+                      href={`/stories/${story.slug}`}
+                      className="text-blue-500 hover:underline"
+                    >
+                      Read more
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-600 dark:text-gray-400">
-              No stories found.
-            </p>
-          )}
-        </div>
-      </section>
+              ))
+            ) : (
+              <p className="text-gray-600 dark:text-gray-400">
+                No stories found.
+              </p>
+            )}
+          </div>
+        </section>
+      </div>
     </>
   );
 };

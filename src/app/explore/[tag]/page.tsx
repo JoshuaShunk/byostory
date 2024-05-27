@@ -1,67 +1,66 @@
-"use client";
+// app/explore/[tag]/page.tsx
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { getXataClient } from "@/xata";
+import { clerkClient } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { PREDEFINED_TAGS } from "@/tags";
 
-const ExplorePage = () => {
-  const [selectedTag, setSelectedTag] = useState<string>("all");
-  const [stories, setStories] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+interface Story {
+  id: string;
+  name: string;
+  tags: string;
+  description: string;
+  wordCount: number;
+  slug: string;
+  accountName?: string;
+}
 
-  useEffect(() => {
-    // Redirect to /explore/all if the page is accessed without a tag
-    router.push("/explore/all");
-  }, [router]);
-
-  useEffect(() => {
-    const fetchStories = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`/api/public-stories?tag=${selectedTag}`);
-        const data = await response.json();
-        if (response.ok) {
-          setStories(data.stories);
-        } else {
-          console.error(data.message);
-        }
-      } catch (error) {
-        console.error("Error fetching stories:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStories();
-  }, [selectedTag]);
-
-  if (loading) {
-    return <div>Loading...</div>;
+const fetchUserDetails = async (userId: string) => {
+  try {
+    const user = await clerkClient.users.getUser(userId);
+    return user;
+  } catch (error) {
+    console.error(`Error fetching user details for userId ${userId}:`, error);
+    return null;
   }
+};
+
+const ExplorePage = async ({ params }: { params: { tag: string } }) => {
+  const { tag } = params;
+
+  const xataClient = getXataClient();
+  const tagFilter =
+    tag === "all"
+      ? { isPublic: true }
+      : { isPublic: true, tags: { $any: `"${tag}"` } };
+
+  const storiesData = await xataClient.db.stories.filter(tagFilter).getMany();
+
+  const storiesWithAccountNames = await Promise.all(
+    storiesData.map(async (story) => {
+      const account = await fetchUserDetails(story.userId);
+      return {
+        ...story,
+        accountName: account
+          ? `${account.firstName} ${account.lastName}`
+          : "Unknown",
+      };
+    })
+  );
+
+  const stories: Story[] = storiesWithAccountNames.map((story) => ({
+    id: story.id ?? "",
+    name: story.name ?? "Untitled",
+    tags: story.tags ?? "",
+    description: story.description ?? "No description",
+    wordCount: story.wordCount ?? 0,
+    slug: story.slug ?? "",
+    accountName: story.accountName ?? "Unknown",
+  }));
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">Explore Public Stories</h1>
-      <div className="mb-4">
-        <label htmlFor="tags" className="mr-2">
-          Filter by Tag:
-        </label>
-        <select
-          id="tags"
-          value={selectedTag}
-          onChange={(e) => setSelectedTag(e.target.value)}
-          className="p-2 border rounded"
-        >
-          <option value="all">All</option>
-          {PREDEFINED_TAGS.map((tag) => (
-            <option key={tag} value={tag}>
-              {tag}
-            </option>
-          ))}
-        </select>
-      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {stories.map((story) => (
           <div

@@ -19,11 +19,13 @@ const Header = () => {
 
   return (
     <div
-      className={cn(`sticky top-0 z-30 w-full transition-all border-b`, {
-        "border-b backdrop-blur-lg": scrolled,
-        "border-b": selectedLayout,
+      className={cn("sticky top-0 z-30 w-full transition-all border-b", {
+        "bg-background-color": scrolled,
       })}
-      style={{ borderColor: "var(--border-color)" }}
+      style={{
+        borderColor: "var(--border-color)",
+        backgroundColor: scrolled ? "var(--background-color)" : "transparent",
+      }}
     >
       <div className="flex h-[47px] items-center justify-between px-4">
         <div className="flex items-center space-x-4">
