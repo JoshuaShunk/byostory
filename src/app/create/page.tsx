@@ -13,7 +13,7 @@ const CreateStory = () => {
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [isPublic, setIsPublic] = useState(false);
-  const [storyLength, setStoryLength] = useState(500);
+  const [storyLength, setStoryLength] = useState(1000);
   const [isSlugAvailable, setIsSlugAvailable] = useState<boolean>(true);
   const [checkSlug, setCheckSlug] = useState<boolean>(false);
   const router = useRouter();
